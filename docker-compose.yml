@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  bot:
+    build: ./bot
+    # No ports exposed since the bot communicates through discord
+    environment:
+        COUNTER_API_URL: ${COUNTER_API_URL}
+        DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+    
