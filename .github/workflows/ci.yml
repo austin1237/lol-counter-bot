@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./bot
-          file: ./Dockerfile
+          file: ./bot/Dockerfile
           push: true
           tags: austin1237/lol-counter-bot:latest
       
