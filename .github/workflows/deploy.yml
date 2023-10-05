@@ -29,6 +29,10 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       
+      - name: Set Docker image sha as env var
+        run: echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_ENV
+      
+      
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7

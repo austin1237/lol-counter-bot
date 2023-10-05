@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "task" {
   [
     {
       "name": "${var.name}",
-      "image": "${var.image}:${var.docker_version}",
+      "image": "${var.image}",
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {

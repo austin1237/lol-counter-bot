@@ -33,8 +33,7 @@ module "fargate" {
 
   name           = "lol-counter-bot-${terraform.workspace}"
   subnet_id      = "${module.vpc.subnet_id}"
-  image          = "austin1237/lol-counter-bot"
-  docker_version = "latest"
+  image          = "austin1237/lol-counter-bot@${var.DOCKER_IMAGE_SHA}"
   cpu            = 256
   memory         = 512
   desired_count  = 1

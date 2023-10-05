@@ -11,10 +11,6 @@ variable "image" {
   description = "The Docker image to run in the ECS Task (e.g. foo/bar)."
 }
 
-variable "docker_version" {
-  description = "The version of the Docker image to run in the ECS Task. This is the the tag on the Docker image (e.g. latest or v3)."
-}
-
 variable "cpu" {
   description = "The number of CPU units to give the ECS Task, where 1024 represents one vCPU."
 }
