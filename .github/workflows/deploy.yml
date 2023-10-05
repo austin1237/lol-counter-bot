@@ -30,8 +30,8 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
       
       - uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.7
+        with:
+          terraform_version: 1.5.7
         
       - run: cd terraform && terraform init
         env:
