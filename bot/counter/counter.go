@@ -18,8 +18,6 @@ func FetchCounter(counterUrl string, champion string) (Counter, error) {
 	// path escape worked with dr mundo
 
 	encodedChampion := url.QueryEscape(champion)
-	// Replace the '+' with '%2B' in the encoded string
-	encodedChampion = url.QueryEscape(encodedChampion)
 	// Construct the final URL with the modified encoded query parameter
 	finalURL := counterUrl + "?champion=" + encodedChampion
 	resp, err := http.Get(finalURL)
