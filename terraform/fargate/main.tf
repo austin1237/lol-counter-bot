@@ -18,12 +18,21 @@ resource "aws_ecs_cluster" "cluster" {
   name = "${var.name}"
 }
 
+resource "aws_ecs_cluster_capacity_providers" "capacity_providers" {
+  cluster_name = aws_ecs_cluster.cluster.name
+
+  capacity_providers = ["FARGATE_SPOT"]
+  default_capacity_provider_strategy {
+    weight            = 100
+    capacity_provider = "FARGATE_SPOT"
+  }
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # CREATE AN ECS SERVICE TO RUN A ECS TASK
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "aws_ecs_service" "service" {
-  launch_type     = "FARGATE"
   name            = "${var.name}"
   cluster         = "${aws_ecs_cluster.cluster.id}"
   task_definition = "${aws_ecs_task_definition.task.arn}"
@@ -32,6 +41,11 @@ resource "aws_ecs_service" "service" {
   network_configuration {
       assign_public_ip = true
       subnets          = ["${var.subnet_id}"]
+  }
+
+  capacity_provider_strategy {
+      capacity_provider = "FARGATE_SPOT"
+      weight            = 100
   }
 }
 
