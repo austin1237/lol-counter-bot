@@ -4,6 +4,7 @@ import (
 	"bot/counter"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -55,6 +56,17 @@ func checkMessages(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
+func daysBetweenNow(unixTimestamp int64) int {
+	// Calculate the difference between the two timestamps in nanoseconds.
+	duration := time.Since(time.Unix(unixTimestamp, 0))
+
+	// Convert the duration to days by dividing by the number of nanoseconds in a day.
+	days := duration.Nanoseconds() / time.Hour.Nanoseconds() / 24
+
+	// Return the number of days.
+	return int(days)
+}
+
 func formatCounterMessage(counters counter.Counter) string {
 	var builder strings.Builder
 
@@ -68,6 +80,12 @@ func formatCounterMessage(counters counter.Counter) string {
 	for i, counterName := range counters.Counters {
 		builder.WriteString(fmt.Sprintf("%d. %s\n", i+1, counterName))
 	}
+
+	builder.WriteString("\n")
+
+	daysSinceUpdate := daysBetweenNow(counters.LastUpdated)
+
+	builder.WriteString("It has been " + fmt.Sprint(daysSinceUpdate) + " days since data was refreshed")
 
 	// Append the closing triple backticks for the code block
 	builder.WriteString("```")

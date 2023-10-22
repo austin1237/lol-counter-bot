@@ -10,8 +10,9 @@ import (
 )
 
 type Counter struct {
-	Champion string   `json:"champion"`
-	Counters []string `json:"counters"`
+	Champion    string   `json:"champion"`
+	Counters    []string `json:"counters"`
+	LastUpdated int64    `json:"lastUpdated"`
 }
 
 func FetchCounter(counterUrl string, champion string) (Counter, error) {
