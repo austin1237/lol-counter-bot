@@ -56,7 +56,7 @@ func checkMessages(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func daysBetweenNow(unixTimestamp int64) int {
+func daysSinceNow(unixTimestamp int64) int {
 	// Calculate the difference between the two timestamps in nanoseconds.
 	duration := time.Since(time.Unix(unixTimestamp, 0))
 
@@ -83,7 +83,7 @@ func formatCounterMessage(counters counter.Counter) string {
 
 	builder.WriteString("\n")
 
-	daysSinceUpdate := daysBetweenNow(counters.LastUpdated)
+	daysSinceUpdate := daysSinceNow(counters.LastUpdated)
 
 	builder.WriteString("It has been " + fmt.Sprint(daysSinceUpdate) + " days since data was refreshed")
 
