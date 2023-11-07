@@ -16,11 +16,11 @@ jobs:
         go-version: '1.20'
 
     - name: Lint/Staticcheck
-      uses: dominikh/staticcheck-action@v1.2.0
-      working-directory: bot
+      uses: dominikh/staticcheck-action@v1.3.0
       with:
         version: "2023.1"
         install-go: false
+        working-directory: bot
 
     - name: Build
       run: go build -v ./...
