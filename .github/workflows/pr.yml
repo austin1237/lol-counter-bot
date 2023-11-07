@@ -14,9 +14,15 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
+
+    - name: lint/staticcheck
+      working-directory: bot
+      run: staticcheck --enable all ./...
+
     - name: Build
       run: go build -v ./...
       working-directory: bot
+      
     - name: Test
       run: go test -v ./...
       working-directory: bot
