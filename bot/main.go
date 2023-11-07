@@ -10,6 +10,7 @@ import (
 
 var counterUrl string
 var discordBotToken string
+var unused string
 
 func init() {
 	// Get the URL from the environment variable
