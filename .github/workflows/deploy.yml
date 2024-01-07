@@ -5,7 +5,7 @@ on:
     branches: [main, dev]
 
 jobs:
-  build:
+  build_and_push_docker_image:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -37,46 +37,91 @@ jobs:
           push: true
           tags: austin1237/lol-counter-bot:latest
       
+  dev_deployment:
+    if: github.ref == 'refs/heads/dev'
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
       - name: Set Docker image sha as env var Dev
-        if: github.ref == 'refs/heads/dev'
         run: | 
           echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_dev.outputs.digest }}" >> $GITHUB_ENV
           echo ${{ steps.docker_build_dev.outputs.digest }}
 
-      - name: Set Docker image sha as env var Prod
-        if: github.ref == 'refs/heads/main'
-        run: | 
-          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_prod.outputs.digest }}" >> $GITHUB_ENV
-          echo ${{ steps.docker_build_prod.outputs.digest }}
-      
-      
-      - uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.7
-        
-      - name: Dev Deployment
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          cd terraform && \
-          terraform init && \
-          terraform plan && \
-          terraform apply -input=false -auto-approve
+      - run: cd terraform && terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+          
+
+      - run: cd terraform && terraform plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'us-east-1'
           TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
         
-      # - name: Prod Deployment
-      #   if: github.ref == 'refs/heads/main'
-      #   run: |
-      #     cd terraform && terraform init
-      #     (terraform workspace new prod || true) && terraform workspace select prod
-      #     terraform plan
-      #     terraform apply -input=false -auto-approve
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: 'us-east-1'
-      #     TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+      - run: cd terraform && terraform apply -input=false -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+  
+
+
+  prod_deployment:
+    if: github.ref == 'refs/heads/prod'
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Set Docker image sha as env var Prod
+        run: | 
+          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_prod.outputs.digest }}" >> $GITHUB_ENV
+          echo ${{ steps.docker_build_prod.outputs.digest }}
+
+      - run: cd terraform && terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+          
+      - run: cd terraform && terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+        
+      - run: cd terraform && terraform apply -input=false -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
+
+
+
       
