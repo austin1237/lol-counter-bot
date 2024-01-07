@@ -19,29 +19,35 @@ jobs:
 
       - name: Build and push Dev
         if: github.ref == 'refs/heads/dev'
-        id: docker_build
+        id: docker_build_dev
         uses: docker/build-push-action@v5
         with:
           context: ./bot
           file: ./bot/Dockerfile
           push: true
-          tags: austin1237/lol-counter-bot:dev-latest
+          tags: austin1237/lol-counter-bot:dev
 
       - name: Build and push Prod
         if: github.ref == 'refs/heads/main'
-        id: docker_build
+        id: docker_build_prod
         uses: docker/build-push-action@v5
         with:
           context: ./bot
           file: ./bot/Dockerfile
           push: true
-          tags: austin1237/lol-counter-bot:prod-latest
+          tags: austin1237/lol-counter-bot:latest
       
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
-      
-      - name: Set Docker image sha as env var
-        run: echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_ENV
+      - name: Set Docker image sha as env var Dev
+        if: github.ref == 'refs/heads/dev'
+        run: | 
+          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_dev.outputs.digest }}" >> $GITHUB_ENV
+          echo ${{ steps.docker_build_dev.outputs.digest }}
+
+      - name: Set Docker image sha as env var Prod
+        if: github.ref == 'refs/heads/main'
+        run: | 
+          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_prod.outputs.digest }}" >> $GITHUB_ENV
+          echo ${{ steps.docker_build_prod.outputs.digest }}
       
       
       - uses: hashicorp/setup-terraform@v2
