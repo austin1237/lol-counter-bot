@@ -36,6 +36,9 @@ jobs:
           file: ./bot/Dockerfile
           push: true
           tags: austin1237/lol-counter-bot:latest
+    outputs:
+      docker_sha_dev: ${{ steps.docker_build_dev.outputs.digest }}
+      docker_sha_prod: ${{ steps.docker_build_prod.outputs.digest }}
       
   dev_deployment:
     if: github.ref == 'refs/heads/dev'
@@ -54,8 +57,8 @@ jobs:
       
       - name: Set Docker image sha as env var Dev
         run: | 
-          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_dev.outputs.digest }}" >> $GITHUB_ENV
-          echo ${{ steps.docker_build_dev.outputs.digest }}
+          echo "TF_VAR_DOCKER_IMAGE_SHA=${{  needs.build_and_push_docker_image.outputs.docker_sha_dev }}" >> $GITHUB_ENV
+          echo ${{ needs.build_and_push_docker_image.outputs.docker_sha_dev }}
 
       - run: cd terraform && terraform init
         env:
