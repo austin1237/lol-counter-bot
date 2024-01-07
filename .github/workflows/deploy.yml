@@ -115,15 +115,8 @@ jobs:
           TF_VAR_COUNTER_API_URL: ${{ secrets.COUNTER_API_URL }}
           TF_VAR_DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
       
-      - run: (terraform workspace new prod || true) && terraform workspace select prod
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-east-1'
-          TF_VAR_COUNTER_API_URL: ${{ secrets.COUNTER_API_URL }}
-          TF_VAR_DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           
-      - run: cd terraform && terraform plan
+      - run: cd terraform && (terraform workspace new prod || true) && terraform workspace select prod && terraform plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -131,7 +124,7 @@ jobs:
           TF_VAR_COUNTER_API_URL: ${{ secrets.COUNTER_API_URL }}
           TF_VAR_DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         
-      - run: cd terraform && terraform apply -input=false -auto-approve
+      - run: cd terraform && (terraform workspace new prod || true) && terraform workspace select prod && terraform apply -input=false -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
