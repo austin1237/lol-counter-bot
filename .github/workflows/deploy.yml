@@ -104,10 +104,18 @@ jobs:
       
       - name: Set Docker image sha as env var Prod
         run: | 
-          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ steps.docker_build_prod.outputs.digest }}" >> $GITHUB_ENV
-          echo ${{ steps.docker_build_prod.outputs.digest }}
+          echo "TF_VAR_DOCKER_IMAGE_SHA=${{ needs.build_and_push_docker_image.outputs.docker_sha_prod }}" >> $GITHUB_ENV
+          echo ${{ needs.build_and_push_docker_image.outputs.docker_sha_prod }}
 
       - run: cd terraform && terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+          TF_VAR_COUNTER_API_URL: ${{ secrets.COUNTER_API_URL }}
+          TF_VAR_DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      
+      - run: (terraform workspace new prod || true) && terraform workspace select prod
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
