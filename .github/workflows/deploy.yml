@@ -39,7 +39,7 @@ jobs:
       
   dev_deployment:
     if: github.ref == 'refs/heads/dev'
-    needs: build
+    needs: build_and_push_docker_image
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -83,7 +83,7 @@ jobs:
 
   prod_deployment:
     if: github.ref == 'refs/heads/prod'
-    needs: build
+    needs: build_and_push_docker_image
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -121,7 +121,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: 'us-east-1'
           TF_VAR_COUNTER_SOURCE_API_URL: ${{ secrets.COUNTER_SOURCE_API_URL }}
-
 
 
       
